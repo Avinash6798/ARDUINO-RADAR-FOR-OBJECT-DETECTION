@@ -1,0 +1,344 @@
+ /*
+ * LCD VSS pin to ground
+ * LCD VDD pin to +5V
+ * 2K2Ohm resistor: ends to LCD VO pin and ground
+ * LCD RS pin to digital pin 12
+ * LCD R/W pin to ground
+ * LCD Enable pin to digital pin 11
+ * LCD D4 pin to digital pin 5
+ * LCD D5 pin to digital pin 4
+ * LCD D6 pin to digital pin 3
+ * LCD D7 pin to digital pin 2
+ * LCD A pin to +5V
+ * LCD K pin to ground
+ * Buzzer + to 220Ohm Resistor leg and - to ground. The other resistor leg goes to pin 9.
+ * HC-SCR GND to ground
+ * HC-SCR Echo to pin 8
+ * HC-SCR Trig to pin 10
+ * HC-SCR Vcc to +5V
+*/
+
+//Defining pins
+#define trigPin 10
+#define echoPin 8
+#define buzPin 9
+#define RS 12
+#define Enable 11
+#define D4 5
+#define D5 4
+#define D6 3
+#define D7 2
+//Defining pitches
+#define NOTE_B0  31
+#define NOTE_C1  33
+#define NOTE_CS1 35
+#define NOTE_D1  37
+#define NOTE_DS1 39
+#define NOTE_E1  41
+#define NOTE_F1  44
+#define NOTE_FS1 46
+#define NOTE_G1  49
+#define NOTE_GS1 52
+#define NOTE_A1  55
+#define NOTE_AS1 58
+#define NOTE_B1  62
+#define NOTE_C2  65
+#define NOTE_CS2 69
+#define NOTE_D2  73
+#define NOTE_DS2 78
+#define NOTE_E2  82
+#define NOTE_F2  87
+#define NOTE_FS2 93
+#define NOTE_G2  98
+#define NOTE_GS2 104
+#define NOTE_A2  110
+#define NOTE_AS2 117
+#define NOTE_B2  123
+#define NOTE_C3  131
+#define NOTE_CS3 139
+#define NOTE_D3  147
+#define NOTE_DS3 156
+#define NOTE_E3  165
+#define NOTE_F3  175
+#define NOTE_FS3 185
+#define NOTE_G3  196
+#define NOTE_GS3 208
+#define NOTE_A3  220
+#define NOTE_AS3 233
+#define NOTE_B3  247
+#define NOTE_C4  262
+#define NOTE_CS4 277
+#define NOTE_D4  294
+#define NOTE_DS4 311
+#define NOTE_E4  330
+#define NOTE_F4  349
+#define NOTE_FS4 370
+#define NOTE_G4  392
+#define NOTE_GS4 415
+#define NOTE_A4  440
+#define NOTE_AS4 466
+#define NOTE_B4  494
+#define NOTE_C5  523
+#define NOTE_CS5 554
+#define NOTE_D5  587
+#define NOTE_DS5 622
+#define NOTE_E5  659
+#define NOTE_F5  698
+#define NOTE_FS5 740
+#define NOTE_G5  784
+#define NOTE_GS5 831
+#define NOTE_A5  880
+#define NOTE_AS5 932
+#define NOTE_B5  988
+#define NOTE_C6  1047
+#define NOTE_CS6 1109
+#define NOTE_D6  1175
+#define NOTE_DS6 1245
+#define NOTE_E6  1319
+#define NOTE_F6  1397
+#define NOTE_FS6 1480
+#define NOTE_G6  1568
+#define NOTE_GS6 1661
+#define NOTE_A6  1760
+#define NOTE_AS6 1865
+#define NOTE_B6  1976
+#define NOTE_C7  2093
+#define NOTE_CS7 2217
+#define NOTE_D7  2349
+#define NOTE_DS7 2489
+#define NOTE_E7  2637
+#define NOTE_F7  2794
+#define NOTE_FS7 2960
+#define NOTE_G7  3136
+#define NOTE_GS7 3322
+#define NOTE_A7  3520
+#define NOTE_AS7 3729
+#define NOTE_B7  3951
+#define NOTE_C8  4186
+#define NOTE_CS8 4435
+#define NOTE_D8  4699
+#define NOTE_DS8 4978
+
+//Including the LCD and sound library:
+#include <LiquidCrystal.h>
+
+// Initialize the LCD library
+LiquidCrystal lcd(RS, Enable, D4, D5, D6, D7);
+
+/////Definition of the LCD special characters///
+uint8_t cc0[8] = {0x00,0x00,0x00,0x00,0x00,0x01,0x03,0x07};
+uint8_t cc1[8] = {0x00,0x00,0x00,0x00,0x00,0x10,0x18,0x1C};
+uint8_t cc2[8] = {0x07,0x03,0x01,0x00,0x00,0x00,0x00,0x00};
+uint8_t cc3[8] = {0x1C,0x18,0x10,0x00,0x00,0x00,0x00,0x00};
+uint8_t cc4[8] = {0x00,0x00,0x00,0x10,0x18,0x0C,0x04,0x06};
+uint8_t cc5[8] = {0x06,0x04,0x0C,0x18,0x10,0x00,0x00,0x00};
+uint8_t cc6[8] = {0x10,0x08,0x0C,0x06,0x02,0x03,0x03,0x03};
+uint8_t cc7[8] = {0x03,0x03,0x03,0x02,0x06,0x0C,0x08,0x10};
+
+////Sound notes setup
+int melody0[] = {NOTE_B3, NOTE_B3,NOTE_B3, NOTE_G3, NOTE_B3,0, NOTE_D4, NOTE_D3};
+int melody1[] = {NOTE_C6,NOTE_C6,NOTE_C6,NOTE_C6};
+int melody2[] = {NOTE_C6,NOTE_C6,NOTE_C6};
+int melody3[] = {NOTE_C6,NOTE_C6};
+int melody4[] = {NOTE_C6};
+
+//Add melodies here, and at the end of the "music" array.
+int* music[6/*number of melodies + 1*/] = {melody0, melody1, melody2, melody3, melody4 /*,add here*/};
+
+////Sound notes durations
+int notesMelody0[] = {8,4,4,8,8,8,2,4};
+int notesMelody1[] = {8,8,8,8};
+int notesMelody2[] = {8,8,8};
+int notesMelody3[] = {8,8};
+int notesMelody4[] = {4};
+
+//Add durations of the melodies here, and at the end of the "noteDurations" array.
+int* noteDurations[6/*number of melodies + 1*/] = {notesMelody0, notesMelody1, notesMelody2 , notesMelody3 , notesMelody4  /*,add here*/};
+
+////Sound sizes
+int sizeMelody0 = sizeof(melody0)/sizeof(int);
+int sizeMelody1 = sizeof(melody1)/sizeof(int);
+int sizeMelody2 = sizeof(melody2)/sizeof(int);
+int sizeMelody3 = sizeof(melody3)/sizeof(int);
+int sizeMelody4 = sizeof(melody4)/sizeof(int);
+//Add sizes here, and at the end of the "sizes" array.
+int sizes[] = {sizeMelody0,sizeMelody1,sizeMelody2,sizeMelody3,sizeMelody4 /*,add here*/};
+
+////Tone Function - Plays the tone
+int playSong(int track, float durConst){
+    for (int thisNote = 0; thisNote < sizes[track]; thisNote++) {
+    int noteDuration = 1000/noteDurations[track][thisNote];
+    tone(buzPin, music[track][thisNote],noteDuration);
+    int pauseBetweenNotes = noteDuration * durConst;
+    delay(pauseBetweenNotes);
+    noTone(buzPin);
+  }
+}
+
+//Declaring a variable that will count the millis so the blinking is independent of "delays"
+unsigned long millisCounter = 0;
+int displaying = 0;
+int redPin=13;
+
+////////////////////////////////////
+//////////////SETUP/////////////////
+////////////////////////////////////
+void setup(){
+  pinMode(redPin,OUTPUT);
+  // Set up the LCD's number of columns and rows: 
+  lcd.begin(16, 2);
+  // Set up the LCD custom chars (8 maximum)
+  lcd.createChar(0, cc0);
+  lcd.createChar(1, cc1);
+  lcd.createChar(2, cc2);
+  lcd.createChar(3, cc3);
+  lcd.createChar(4, cc4);
+  lcd.createChar(5, cc5);
+  lcd.createChar(6, cc6);
+  lcd.createChar(7, cc7);
+  //Initializes HC-SCR04 pins
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  //Plays intro song
+  playSong(0,1.30);
+}
+
+////////////////////////////////////
+//////////////LOOP//////////////////
+////////////////////////////////////
+
+void loop()
+{
+  unsigned long millisNow = millis();
+  long duration;
+  int distance;
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  //Measures the distance
+  duration = pulseIn(echoPin, HIGH);
+  distance = (duration/2) / 29.1;
+
+  if (distance >= 400 || distance <= 0){//Evaluate the distance value.
+    lcd.setCursor(0, 0);
+    lcd.print("Out of Range    ");
+    lcd.setCursor(0, 1);
+    lcd.print("                  ");
+    }
+  else {
+
+    Serial.print(distance);
+    Serial.println(" cm");
+    lcd.setCursor(0, 0);
+    lcd.print("Distance:");
+    lcd.setCursor(2, 1);
+    lcd.print(distance);
+    lcd.print(" cm.  ");
+    
+    //Distance animation
+    if(distance <= 7)
+    {
+      digitalWrite(redPin, LOW);
+      if(millisNow-millisCounter>50 && displaying == 0){//This part is used for the blinking while at 10 cm less.
+      //Each of these "lcd.setCursor" and "lcd.write" are responsible for the drawings.
+      lcd.setCursor(10, 0);//This positionates the cursor on the desired slot
+      lcd.write(byte(0));//This writes the prefab symbols
+      lcd.write(byte(1));
+      lcd.write(byte(4));
+      lcd.write(" ");
+      lcd.write(" ");
+      lcd.write(" ");
+      lcd.setCursor(10, 1);
+      lcd.write(byte(2));
+      lcd.write(byte(3));
+      lcd.write(byte(5));
+      lcd.write(" ");
+      lcd.write(" ");
+      lcd.write(" ");
+      playSong(1,1.30);//This plays the "beep"
+      millisCounter = millisNow;
+      displaying = 1;
+      } else {lcd.setCursor(10, 0);lcd.write("      ");lcd.setCursor(10, 1);lcd.write("      ");playSong(1,1.30);displaying=0;millisCounter = millisNow;}
+    }
+    if(distance <= 10)
+    {
+      if(millisNow-millisCounter>50 && displaying == 0){//This part is used for the blinking while at 10 cm less.
+      //Each of these "lcd.setCursor" and "lcd.write" are responsible for the drawings.
+      lcd.setCursor(10, 0);//This positionates the cursor on the desired slot
+      lcd.write(byte(0));//This writes the prefab symbols
+      lcd.write(byte(1));
+      lcd.write(byte(4));
+      lcd.write(" ");
+      lcd.write(" ");
+      lcd.write(" ");
+      lcd.setCursor(10, 1);
+      lcd.write(byte(2));
+      lcd.write(byte(3));
+      lcd.write(byte(5));
+      lcd.write(" ");
+      lcd.write(" ");
+      lcd.write(" ");
+      playSong(1,1.30);//This plays the "beep"
+      millisCounter = millisNow;
+      displaying = 1;
+      } else {lcd.setCursor(10, 0);lcd.write("      ");lcd.setCursor(10, 1);lcd.write("      ");playSong(1,1.30);displaying=0;millisCounter = millisNow;}
+    }
+    else if(distance <= 25)
+    {
+      digitalWrite(redPin, HIGH);
+    lcd.setCursor(10, 0);
+    lcd.write(byte(0));
+    lcd.write(byte(1));
+    lcd.write(byte(4));
+    lcd.write(byte(6));
+    lcd.write(" ");
+    lcd.write(" ");
+    lcd.setCursor(10, 1);
+    lcd.write(byte(2));
+    lcd.write(byte(3));
+    lcd.write(byte(5));
+    lcd.write(byte(7));
+    lcd.write(" ");
+    lcd.write(" ");
+    playSong(2,2.07);
+    }
+    else if(distance <= 60){
+      digitalWrite(redPin, HIGH);
+    lcd.setCursor(10, 0);
+    lcd.write(byte(0));
+    lcd.write(byte(1));
+    lcd.write(byte(4));
+    lcd.write(byte(6));
+    lcd.write(byte(6));
+    lcd.write(" ");
+    lcd.setCursor(10, 1);
+    lcd.write(byte(2));
+    lcd.write(byte(3));
+    lcd.write(byte(5));
+    lcd.write(byte(7));
+    lcd.write(byte(7));
+    lcd.write(" ");
+    playSong(3,3.60);
+    }
+    else if(distance <= 400){
+      digitalWrite(redPin, HIGH);
+    lcd.setCursor(10, 0);
+    lcd.write(byte(0));
+    lcd.write(byte(1));
+    lcd.write(byte(4));
+    lcd.write(byte(6));
+    lcd.write(byte(6));
+    lcd.write(byte(6));
+    lcd.setCursor(10, 1);
+    lcd.write(byte(2));
+    lcd.write(byte(3));
+    lcd.write(byte(5));
+    lcd.write(byte(7));
+    lcd.write(byte(7));
+    lcd.write(byte(7));
+    playSong(4,3.60);
+    }
+  }
+}
